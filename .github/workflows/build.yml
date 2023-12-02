@@ -1,0 +1,52 @@
+# Github Actions Worflow file 
+
+name: Kernel Build 
+
+on:
+  workflow_dispatch:
+    inputs:
+      toolchain:
+        description: 'Select a toolchain clang'
+        required: true
+
+env:
+  TC: ${{ github.event.inputs.toolchain }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup build kernel environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+      - name: Start building Kernel
+        run: |
+          git config --global user.name "Jaison Palacio"
+          git config --global user.email "jaisondpalacio@gmail.com"
+          echo "https://jaisondp:$GH_TOKEN@github.com" > ~/.git-credentials
+          git config --global credential.helper "store --file ~/.git-credentials"
+          
+          git clone --depth=1 https://gitlab.com/MT6768Lab/KernelTree.git kernel
+
+          if [ "$TC" == "Neutron" ]; then
+            mv build_neutron-clang.sh kernel/build.sh
+          elif [ "$TC" == "ZYC" ]; then
+            mv build_zyc-clang.sh kernel/build.sh        
+          else
+            echo "Invalid toolchain option selected!"
+            exit 1
+          fi
+
+          cp upload-script.sh kernel/upload-script.sh
+          cd kernel && bash build.sh
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: AK3 DIR 
+          path: kernel/AnyKernel3/*
+            
