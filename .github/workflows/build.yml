@@ -42,11 +42,14 @@ jobs:
             exit 1
           fi
 
-          cp upload-script.sh kernel/upload-script.sh
           cd kernel && bash build.sh
-      - name: Upload Artifacts
+      - name: Upload Artifacts 1
         uses: actions/upload-artifact@v3
         with:
-          name: AK3 DIR 
-          path: kernel/AnyKernel3/*
-            
+          name: out directory  
+          path: kernel/out/arch/arm64/boot/*
+      - name: Upload Artifacts 2
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel zip  
+          path: kernel/AnyKernel3/*.zip

@@ -79,8 +79,6 @@ echo -e "\n\e[1;93m[*] Starting compilation... \e[0m"
 make -j$(nproc --all) $MAKE_PARAMS || exit $?
 
 kernel="out/arch/arm64/boot/Image.gz-dtb"
-dtb="out/arch/arm64/boot/dtb.img"
-dtbo="out/arch/arm64/boot/dtbo.img"
 
 if [ ! -f "$kernel" ]; then
 	echo -e "\n\e[1;32m[✗] Compilation failed! \e[0m"
@@ -100,13 +98,13 @@ fi
 echo -e "\n\e[1;32m[*] Create a flashable zip! \e[0m"
 
 cp $kernel AnyKernel3
-cp $dtb AnyKernel3
-cp $dtbo AnyKernel3
 cd AnyKernel3
 zip -r9 "$ZIPNAME_UNSIGNED" * -x .git README.md *placeholder
 curl -sLo zipsigner-3.0.jar https://github.com/Magisk-Modules-Repo/zipsigner/raw/master/bin/zipsigner-3.0-dexed.jar
 java -jar zipsigner-3.0.jar "$ZIPNAME_UNSIGNED" "$ZIPNAME_SIGNED"
 echo -e "\n\e[1;32m[✓] Create flashable kernel completed! \e[0m"
+
+wget https://raw.githubusercontent.com/jaisondp/kernel_build/master/upload-script.sh 
 
 bash upload-script.sh $ZIPNAME_UNSIGNED
 bash upload-script.sh $ZIPNAME_SIGNED
