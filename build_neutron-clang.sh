@@ -104,10 +104,10 @@ curl -sLo zipsigner-3.0.jar https://github.com/Magisk-Modules-Repo/zipsigner/raw
 java -jar zipsigner-3.0.jar "$ZIPNAME_UNSIGNED" "$ZIPNAME_SIGNED"
 echo -e "\n\e[1;32m[✓] Create flashable kernel completed! \e[0m"
 
+echo -e "\n\e[1;32m[✓] Uploading file to mirror! \e[0m"
 wget https://raw.githubusercontent.com/jaisondp/kernel_build/master/upload-script.sh 
-
-bash upload-script.sh $ZIPNAME_UNSIGNED
 bash upload-script.sh $ZIPNAME_SIGNED
+rm $ZIPNAME_UNSIGNED
 
 echo -e "\n\e[1;32m[✓] Completed in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !  \e[0m"
 echo -e "\n\e[1;32m[*] Zip: $ZIPNAME_SIGNED \e[0m"

@@ -43,13 +43,23 @@ jobs:
           fi
 
           cd kernel && bash build.sh
-      - name: Upload Artifacts 1
+      - name: Upload Kernel
         uses: actions/upload-artifact@v3
         with:
-          name: out directory  
-          path: kernel/out/arch/arm64/boot/*
-      - name: Upload Artifacts 2
-        uses: actions/upload-artifact@v3
-        with:
-          name: kernel zip  
+          name: sapphire   
           path: kernel/AnyKernel3/*.zip
+      - name: Upload Image.gz
+        uses: actions/upload-artifact@v3
+        with:
+          name: image 
+          path: kernel/out/arch/arm64/boot/Image.gz
+      - name: Upload Image.gz-dtb
+        uses: actions/upload-artifact@v3
+        with:
+          name: image-dtb
+          path: kernel/out/arch/arm64/boot/Image.gz-dtb
+      - name: Upload mt6768.dtb
+        uses: actions/upload-artifact@v3
+        with:
+          name: dtb
+          path: kernel/out/arch/arm64/boot/dts/mediatek/mt6768.dtb
