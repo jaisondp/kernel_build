@@ -70,6 +70,9 @@ fi
 export KBUILD_BUILD_USER="Jaison"
 export KBUILD_BUILD_HOST="$(source /etc/os-release && echo "${NAME}")"
 
+echo 'CONFIG_OVERLAY_FS=y' >> arch/arm64/configs/merlin_defconfig 
+echo 'CONFIG_SCHED_CASS=y' >> arch/arm64/configs/merlin_defconfig
+
 mkdir -p out
 make O=out ARCH=arm64 $DEFCONFIG savedefconfig
 cp out/defconfig arch/arm64/configs/$DEFCONFIG

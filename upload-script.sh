@@ -1,22 +1,47 @@
 #!/bin/bash
 
-# Exit if No File is Specified
-if [[ "$#"  ==  '0' ]]; then
-echo  -e 'ERROR: No File Specified!' && exit 1
+if [[ "$#" == '0' ]]; then
+    echo -e 'ERROR: No File Specified!' && exit 1
 fi
 
-# File to Upload
+while getopts ":gp" option; do
+    case "${option}" in
+        g)
+            SERVER="gofile"
+            ;;
+        p)
+            SERVER="pixeldrain"
+            ;;
+        *)
+            echo "Invalid option: -$OPTARG. Use -g for Gofile or -p for Pixeldrain." >&2
+            exit 1
+            ;;
+    esac
+done
+
+SERVER="${SERVER:-gofile}"
+
 FILE="@$1"
 
-# Find the Best server to upload
-SERVER=$(curl -s https://api.gofile.io/getServer | jq -r '.data|.server')
+if [[ "${SERVER}" == "gofile" ]]; then
+    SERVER_URL="https://api.gofile.io/getServer"
+    UPLOAD_URL="https://gofile.io/uploadFile"
+    LINK_KEY=".data|.downloadPage"
+elif [[ "${SERVER}" == "pixeldrain" ]]; then
+    SERVER_URL="https://pixeldrain.com/api/file/"
+    UPLOAD_URL="https://pixeldrain.com/api/file/"
+    LINK_KEY="\"id\":\"[^\"]*\"" 
+else
+    echo "Invalid server option: ${SERVER}. Use -g for Gofile or -p for Pixeldrain." >&2
+    exit 1
+fi
 
-UPLOAD=$(curl -F file=${FILE} https://${SERVER}.gofile.io/uploadFile)
+SERVER=$(curl -s "${SERVER_URL}" | jq -r '.data|.server')
+UPLOAD=$(curl -F file=${FILE} "${UPLOAD_URL}")
+LINK=$(echo ${UPLOAD} | jq -r "${LINK_KEY}")
 
-LINK=$(echo $UPLOAD | jq -r '.data|.downloadPage')
-
-# Print the link!
-echo "\n\e[1;32m[✓] Uploaded successfully! \e[0m"
-echo "\n\e[1;32m[✓] $LINK \e[0m"
+echo -e "\n\e[1;32m[✓] Uploaded successfully! \e[0m"
+echo -e "\n\e[1;32m[✓] $LINK \e[0m"
 
 echo " "
+exit 1
